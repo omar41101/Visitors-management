@@ -46,7 +46,17 @@ const authController = {
         sameSite: 'strict',
         maxAge: 60 * 60 * 1000 // 1 hour
       });
-      res.json({ accessToken, refreshToken });
+      res.json({
+        user: {
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+          role: user.role,
+          department: user.department,
+        },
+        accessToken,
+        refreshToken
+      });
     } catch (error) {
       res.status(500).json({ message: 'Server error.', error: error.message });
     }
