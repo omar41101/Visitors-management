@@ -47,6 +47,7 @@ const authController = {
         maxAge: 60 * 60 * 1000 // 1 hour
       });
       res.json({
+        token: accessToken,
         user: {
           _id: user._id,
           username: user.username,

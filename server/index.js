@@ -1,5 +1,7 @@
 import path from "path";
 import express from "express";
+import http from "http";
+import { Server } from "socket.io";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import authRoutes from './routes/authRoutes.js';
@@ -13,7 +15,7 @@ import connectDB from "./config/db.js";
 import nodemailer from "nodemailer"
 import cors from "cors";
 //import uploadRoutes from "./routes/uploadRoutes.js"
-dotenv.config();
+ dotenv.config();
 const port = process.env.PORT || 5000;
 
 // Connect to MongoDB
@@ -27,6 +29,28 @@ app.use(cors({
   origin: 'http://localhost:5173',
   credentials: true,
 }));
+
+// Création du serveur HTTP
+const server = http.createServer(app);
+
+// Création de l'instance Socket.io
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173", // ou votre URL frontend
+    credentials: true,
+  },
+});
+
+// Stockage de l'instance io pour l'utiliser dans les contrôleurs
+app.set("io", io);
+
+// Connexion d'un client
+io.on("connection", (socket) => {
+  console.log("Agent connecté au contrôle d'accès temps réel");
+  socket.on("disconnect", () => {
+    console.log("Agent déconnecté");
+  });
+});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/visitors', visitorRoutes);
@@ -79,4 +103,9 @@ app.post("/api/send-email", async (req, res) => {
 
 const __dirname = path.resolve()
 //app.use('/uploads', express.static(path.join(__dirname +'/Uploads')))
-app.listen(port, () => console.log(`server running on port: ${port}`));
+server.listen(port, () => console.log(`server running on port: ${port}`));
+
+// Exportez une fonction utilitaire pour notifier les agents
+export const notifyAccessUpdate = () => {
+  io.emit("access-update");
+};

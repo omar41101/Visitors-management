@@ -1,21 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import api from '../api';
+import Alert from '../components/Alert';
+import useAlert from '../hooks/useAlert';
 
 const Visitors = () => {
   const [visitors, setVisitors] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [form, setForm] = useState({ name: '', email: '', phone: '', company: '' });
   const [editingId, setEditingId] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { alert, showSuccess, showError, showWarning, hideAlert } = useAlert();
 
   const fetchVisitors = async () => {
     setLoading(true);
     try {
       const res = await api.get('/visitors');
       setVisitors(res.data);
-      setError('');
     } catch (err) {
-      setError('Failed to fetch visitors');
+      showError('Failed to fetch visitors');
     }
     setLoading(false);
   };
@@ -26,17 +28,25 @@ const Visitors = () => {
 
   const handleSubmit = async e => {
     e.preventDefault();
+    setIsSubmitting(true);
+    hideAlert();
+    
     try {
       if (editingId) {
         await api.put(`/visitors/${editingId}`, form);
+        showSuccess('Visitor updated successfully!');
       } else {
         await api.post('/visitors', form);
+        showSuccess('Visitor added successfully!');
       }
       setForm({ name: '', email: '', phone: '', company: '' });
       setEditingId(null);
       fetchVisitors();
-    } catch {
-      setError('Failed to save visitor');
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || 'Failed to save visitor';
+      showError(errorMessage);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -46,13 +56,22 @@ const Visitors = () => {
   };
 
   const handleDelete = async id => {
-    if (!window.confirm('Delete this visitor?')) return;
+    showWarning('Are you sure you want to delete this visitor?', false);
+    
     try {
       await api.delete(`/visitors/${id}`);
+      showSuccess('Visitor deleted successfully!');
       fetchVisitors();
-    } catch {
-      setError('Failed to delete visitor');
+    } catch (err) {
+      const errorMessage = err.response?.data?.message || 'Failed to delete visitor';
+      showError(errorMessage);
     }
+  };
+
+  const handleCancelEdit = () => {
+    setForm({ name: '', email: '', phone: '', company: '' });
+    setEditingId(null);
+    hideAlert();
   };
 
   return (
@@ -79,15 +98,32 @@ const Visitors = () => {
               <input name="company" value={form.company} onChange={handleChange} placeholder="Company" className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
             </div>
             <div className="flex gap-2">
-              <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition w-full">{editingId ? 'Update' : 'Add'}</button>
-              {editingId && <button type="button" onClick={() => { setForm({ name: '', email: '', phone: '', company: '' }); setEditingId(null); }} className="bg-gray-300 px-4 py-2 rounded-lg w-full">Cancel</button>}
+              <button 
+                type="submit" 
+                disabled={isSubmitting}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 transition w-full disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? 'Saving...' : (editingId ? 'Update' : 'Add')}
+              </button>
+              {editingId && (
+                <button 
+                  type="button" 
+                  onClick={handleCancelEdit} 
+                  className="bg-gray-300 px-4 py-2 rounded-lg w-full hover:bg-gray-400 transition"
+                >
+                  Cancel
+                </button>
+              )}
             </div>
           </form>
-          {error && <div className="mt-4 text-red-500">{error}</div>}
         </div>
         <div className="bg-white rounded-xl shadow-lg p-8">
           <h3 className="text-xl font-semibold text-gray-700 mb-6">Visitor List</h3>
-          {loading ? <div>Loading...</div> : (
+          {loading ? (
+            <div className="flex justify-center items-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          ) : (
             <div className="overflow-x-auto">
               <table className="min-w-full bg-white rounded-xl overflow-hidden">
                 <thead className="bg-gray-100">
@@ -107,8 +143,18 @@ const Visitors = () => {
                       <td className="px-6 py-4 whitespace-nowrap">{v.phone}</td>
                       <td className="px-6 py-4 whitespace-nowrap">{v.company}</td>
                       <td className="px-6 py-4 whitespace-nowrap space-x-2">
-                        <button onClick={() => handleEdit(v)} className="bg-yellow-400 text-white px-3 py-1 rounded-lg shadow hover:bg-yellow-500 transition">Edit</button>
-                        <button onClick={() => handleDelete(v._id)} className="bg-red-500 text-white px-3 py-1 rounded-lg shadow hover:bg-red-600 transition">Delete</button>
+                        <button 
+                          onClick={() => handleEdit(v)} 
+                          className="bg-yellow-400 text-white px-3 py-1 rounded-lg shadow hover:bg-yellow-500 transition"
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(v._id)} 
+                          className="bg-red-500 text-white px-3 py-1 rounded-lg shadow hover:bg-red-600 transition"
+                        >
+                          Delete
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -118,6 +164,15 @@ const Visitors = () => {
           )}
         </div>
       </div>
+      
+      <Alert 
+        type={alert.type}
+        message={alert.message}
+        isVisible={alert.isVisible}
+        onClose={hideAlert}
+        autoClose={alert.autoClose}
+        autoCloseTime={alert.autoCloseTime}
+      />
     </div>
   );
 };

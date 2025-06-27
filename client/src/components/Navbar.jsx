@@ -7,6 +7,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
     navigate('/login');
   };
 
@@ -21,6 +22,8 @@ const Navbar = () => {
             <Link to="/dashboard" className="hover:underline">Dashboard</Link>
             <Link to="/visitors" className="hover:underline">Visitors</Link>
             <Link to="/visits" className="hover:underline">Visits</Link>
+            <Link to="/visit-history" className="hover:underline">Visit History</Link>
+            <Link to="/qr-scanner" className="hover:underline">QR Scanner</Link>
             <Link to="/documents" className="hover:underline">Documents</Link>
             <Link to="/send-email" className="hover:underline">Send Email</Link>
             <button onClick={handleLogout} className="ml-2 bg-white text-blue-600 px-3 py-1 rounded hover:bg-gray-100">Logout</button>
