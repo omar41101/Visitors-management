@@ -1,7 +1,6 @@
 import path from "path";
 import express from "express";
 import http from "http";
-import { Server } from "socket.io";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import authRoutes from './routes/authRoutes.js';
@@ -26,31 +25,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(cors({
-  origin: 'http://localhost:5173',
-  credentials: true,
+  origin: 'http://localhost:5173', // Changed from 5173 to 5174
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 
 // Création du serveur HTTP
 const server = http.createServer(app);
 
 // Création de l'instance Socket.io
-const io = new Server(server, {
-  cors: {
-    origin: "http://localhost:5173", // ou votre URL frontend
-    credentials: true,
-  },
-});
+
 
 // Stockage de l'instance io pour l'utiliser dans les contrôleurs
-app.set("io", io);
 
-// Connexion d'un client
-io.on("connection", (socket) => {
-  console.log("Agent connecté au contrôle d'accès temps réel");
-  socket.on("disconnect", () => {
-    console.log("Agent déconnecté");
-  });
-});
 
 app.use('/api/auth', authRoutes);
 app.use('/api/visitors', visitorRoutes);

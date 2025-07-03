@@ -13,6 +13,7 @@ import QRScanner from './components/QRScanner';
 import Documents from './pages/Documents';
 import SendEmail from './pages/SendEmail';
 import PublicRoute from './components/PublicRoute';
+import VisitorProfile from './pages/VisitorProfile';
 
 const App = () => {
   return (
@@ -68,6 +69,11 @@ const App = () => {
           <Route path="/send-email" element={
             <ProtectedRoute>
               <SendEmail />
+            </ProtectedRoute>
+          } />
+          <Route path="/visitors/:visitorId" element={
+            <ProtectedRoute>
+              <VisitorProfile />
             </ProtectedRoute>
           } />
           <Route path="/" element={<Navigate to="/dashboard" />} />

@@ -20,6 +20,21 @@ export async function getVisitors(req, res) {
   }
 }
 
+export async function getVisitorById(req, res) {
+  try {
+    const { id } = req.params;
+    const visitor = await Visitor.findById(id);
+    
+    if (!visitor) {
+      return res.status(404).json({ message: 'Visitor not found' });
+    }
+    
+    res.json(visitor);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error.', error: error.message });
+  }
+}
+
 export async function updateVisitor(req, res) {
   try {
     const { id } = req.params;
