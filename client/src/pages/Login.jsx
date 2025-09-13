@@ -1,90 +1,102 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import api from "../api"
-import Alert from "../components/Alert"
-import useAlert from "../hooks/useAlert"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../api";
+import Alert from "../components/Alert";
+import useAlert from "../hooks/useAlert";
 
 const Login = () => {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [emailError, setEmailError] = useState("")
-  const [passwordError, setPasswordError] = useState("")
-  const navigate = useNavigate()
-  const { alert, showSuccess, showError, hideAlert } = useAlert()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const navigate = useNavigate();
+  const { alert, showSuccess, showError, hideAlert } = useAlert();
 
   const validateForm = () => {
-    let isValid = true
+    let isValid = true;
 
-    setEmailError("")
-    setPasswordError("")
+    setEmailError("");
+    setPasswordError("");
 
     if (!email) {
-      setEmailError("Email is required")
-      isValid = false
+      setEmailError("Email is required");
+      isValid = false;
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      setEmailError("Email is invalid")
-      isValid = false
+      setEmailError("Email is invalid");
+      isValid = false;
     }
 
     if (!password) {
-      setPasswordError("Password is required")
-      isValid = false
+      setPasswordError("Password is required");
+      isValid = false;
     } else if (password.length < 6) {
-      setPasswordError("Password must be at least 6 characters")
-      isValid = false
+      setPasswordError("Password must be at least 6 characters");
+      isValid = false;
     }
 
-    return isValid
-  }
+    return isValid;
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!validateForm()) {
-      return
+      return;
     }
 
-    setIsLoading(true)
-    hideAlert()
+    setIsLoading(true);
+    hideAlert();
 
     try {
-      const res = await api.post("/auth/login", { email, password }).catch((err) => {
-        if (!err.response) {
-          throw new Error("Network error. Please check your connection and backend server.")
-        }
-        throw err
-      })
+      const res = await api
+        .post("/auth/login", { email, password })
+        .catch((err) => {
+          if (!err.response) {
+            throw new Error(
+              "Network error. Please check your connection and backend server."
+            );
+          }
+          throw err;
+        });
 
-      localStorage.setItem("token", res.data.token)
-      localStorage.setItem("user", JSON.stringify(res.data.user))
-      showSuccess("Login successful! Redirecting...", true, 2000)
-      setTimeout(() => navigate("/dashboard"), 2000)
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      showSuccess("Login successful! Redirecting...", true, 2000);
+
+      setTimeout(() => {
+        if (res.data.user?.role === "agent") {
+          navigate("/visitors");
+        } else {
+          navigate("/dashboard");
+        }
+      }, 2000);
     } catch (err) {
-      let errorMessage = "Login failed. Please try again."
+      let errorMessage = "Login failed. Please try again.";
 
       if (err.message.includes("Network Error")) {
-        errorMessage = "Cannot connect to server. Please check your network and ensure the backend is running."
+        errorMessage =
+          "Cannot connect to server. Please check your network and ensure the backend is running.";
       } else if (err.response) {
         switch (err.response.status) {
           case 400:
-            errorMessage = "Invalid request data."
-            break
+            errorMessage = "Invalid request data.";
+            break;
           case 401:
-            errorMessage = "Invalid email or password."
-            break
+            errorMessage = "Invalid email or password.";
+            break;
           default:
-            errorMessage = err.response.data?.message || errorMessage
+            errorMessage = err.response.data?.message || errorMessage;
         }
       }
 
-      showError(errorMessage)
+      showError(errorMessage);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50 to-stone-100 flex items-center justify-center py-12 px-4">
@@ -92,7 +104,12 @@ const Login = () => {
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/20 p-8 hover:shadow-3xl transition-all duration-300">
           <div className="text-center mb-8">
             <div className="w-16 h-16 bg-gradient-to-r from-violet-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg
+                className="w-8 h-8 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -109,13 +126,15 @@ const Login = () => {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Email Address</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Email Address
+              </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => {
-                  setEmail(e.target.value)
-                  setEmailError("")
+                  setEmail(e.target.value);
+                  setEmailError("");
                 }}
                 required
                 className={`w-full border-2 ${
@@ -125,7 +144,12 @@ const Login = () => {
               />
               {emailError && (
                 <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -139,13 +163,15 @@ const Login = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-700 mb-2">Password</label>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Password
+              </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => {
-                  setPassword(e.target.value)
-                  setPasswordError("")
+                  setPassword(e.target.value);
+                  setPasswordError("");
                 }}
                 required
                 className={`w-full border-2 ${
@@ -155,7 +181,12 @@ const Login = () => {
               />
               {passwordError && (
                 <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -180,7 +211,12 @@ const Login = () => {
                 </>
               ) : (
                 <>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -225,7 +261,7 @@ const Login = () => {
         autoCloseTime={alert.autoCloseTime}
       />
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

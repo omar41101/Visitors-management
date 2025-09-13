@@ -1,17 +1,17 @@
-"use client"
+"use client";
 
-import React from "react"
-import { Link, useNavigate } from "react-router-dom"
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
-  const user = JSON.parse(localStorage.getItem("user"))
-  const navigate = useNavigate()
+  const user = JSON.parse(localStorage.getItem("user"));
+  const navigate = useNavigate();
 
   const handleLogout = () => {
-    localStorage.removeItem("user")
-    localStorage.removeItem("token")
-    navigate("/login")
-  }
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
   return (
     <nav className="bg-white/90 backdrop-blur-md border-b border-white/20 shadow-lg sticky top-0 z-50">
@@ -19,9 +19,17 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo/Brand */}
           <div className="flex items-center">
-            <Link to="/dashboard" className="flex items-center gap-3 group transition-all duration-200 hover:scale-105">
+            <Link
+              to="/dashboard"
+              className="flex items-center gap-3 group transition-all duration-200 hover:scale-105"
+            >
               <div className="w-10 h-10 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg
+                  className="w-6 h-6 text-white"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -37,12 +45,17 @@ const Navbar = () => {
           </div>
 
           {/* Navigation Links */}
+          {/* Navigation Links */}
           <div className="hidden md:flex items-center space-x-1">
             {user ? (
               <>
-                <NavLink to="/dashboard" icon="dashboard">
-                  Dashboard
-                </NavLink>
+                {/* Show Dashboard only if NOT agent */}
+                {user.role !== "agent" && (
+                  <NavLink to="/dashboard" icon="dashboard">
+                    Dashboard
+                  </NavLink>
+                )}
+
                 <NavLink to="/visitors" icon="users">
                   Visitors
                 </NavLink>
@@ -77,15 +90,24 @@ const Navbar = () => {
                       </span>
                     </div>
                     <div className="hidden lg:block">
-                      <p className="text-sm font-semibold text-slate-800">{user.username || "User"}</p>
-                      <p className="text-xs text-slate-500 capitalize">{user.role || "Member"}</p>
+                      <p className="text-sm font-semibold text-slate-800">
+                        {user.username || "User"}
+                      </p>
+                      <p className="text-xs text-slate-500 capitalize">
+                        {user.role || "Member"}
+                      </p>
                     </div>
                   </div>
                   <button
                     onClick={handleLogout}
                     className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-2 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 hover:scale-105 flex items-center gap-2"
                   >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -116,8 +138,8 @@ const Navbar = () => {
         </div>
       </div>
     </nav>
-  )
-}
+  );
+};
 
 // Navigation Link Component
 const NavLink = ({ to, children, icon }) => {
@@ -195,9 +217,9 @@ const NavLink = ({ to, children, icon }) => {
           d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
         />
       ),
-    }
-    return icons[iconName] || icons.dashboard
-  }
+    };
+    return icons[iconName] || icons.dashboard;
+  };
 
   return (
     <Link
@@ -214,12 +236,12 @@ const NavLink = ({ to, children, icon }) => {
       </svg>
       <span className="text-sm">{children}</span>
     </Link>
-  )
-}
+  );
+};
 
 // Mobile Menu Component
 const MobileMenu = ({ user, handleLogout }) => {
-  const [isOpen, setIsOpen] = React.useState(false)
+  const [isOpen, setIsOpen] = React.useState(false);
 
   return (
     <div className="relative">
@@ -227,11 +249,26 @@ const MobileMenu = ({ user, handleLogout }) => {
         onClick={() => setIsOpen(!isOpen)}
         className="p-2 rounded-xl text-slate-700 hover:text-slate-900 hover:bg-slate-100/80 transition-all duration-200"
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg
+          className="w-6 h-6"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
           {isOpen ? (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
           ) : (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
           )}
         </svg>
       </button>
@@ -255,33 +292,65 @@ const MobileMenu = ({ user, handleLogout }) => {
                     </span>
                   </div>
                   <div>
-                    <p className="font-semibold text-slate-800">{user.username || "User"}</p>
-                    <p className="text-xs text-slate-500 capitalize">{user.role || "Member"}</p>
+                    <p className="font-semibold text-slate-800">
+                      {user.username || "User"}
+                    </p>
+                    <p className="text-xs text-slate-500 capitalize">
+                      {user.role || "Member"}
+                    </p>
                   </div>
                 </div>
               </div>
 
               {/* Navigation Links */}
               <div className="space-y-1 px-2">
-                <MobileNavLink to="/dashboard" icon="dashboard" onClick={() => setIsOpen(false)}>
+                <MobileNavLink
+                  to="/dashboard"
+                  icon="dashboard"
+                  onClick={() => setIsOpen(false)}
+                >
                   Dashboard
                 </MobileNavLink>
-                <MobileNavLink to="/visitors" icon="users" onClick={() => setIsOpen(false)}>
+                <MobileNavLink
+                  to="/visitors"
+                  icon="users"
+                  onClick={() => setIsOpen(false)}
+                >
                   Visitors
                 </MobileNavLink>
-                <MobileNavLink to="/visits" icon="calendar" onClick={() => setIsOpen(false)}>
+                <MobileNavLink
+                  to="/visits"
+                  icon="calendar"
+                  onClick={() => setIsOpen(false)}
+                >
                   Visits
                 </MobileNavLink>
-                <MobileNavLink to="/visit-history" icon="history" onClick={() => setIsOpen(false)}>
+                <MobileNavLink
+                  to="/visit-history"
+                  icon="history"
+                  onClick={() => setIsOpen(false)}
+                >
                   Visit History
                 </MobileNavLink>
-                <MobileNavLink to="/qr-scanner" icon="qr" onClick={() => setIsOpen(false)}>
+                <MobileNavLink
+                  to="/qr-scanner"
+                  icon="qr"
+                  onClick={() => setIsOpen(false)}
+                >
                   QR Scanner
                 </MobileNavLink>
-                <MobileNavLink to="/documents" icon="documents" onClick={() => setIsOpen(false)}>
+                <MobileNavLink
+                  to="/documents"
+                  icon="documents"
+                  onClick={() => setIsOpen(false)}
+                >
                   Documents
                 </MobileNavLink>
-                <MobileNavLink to="/send-email" icon="email" onClick={() => setIsOpen(false)}>
+                <MobileNavLink
+                  to="/send-email"
+                  icon="email"
+                  onClick={() => setIsOpen(false)}
+                >
                   Send Email
                 </MobileNavLink>
               </div>
@@ -290,12 +359,17 @@ const MobileMenu = ({ user, handleLogout }) => {
               <div className="px-2 pt-4 border-t border-slate-200 mt-4">
                 <button
                   onClick={() => {
-                    handleLogout()
-                    setIsOpen(false)
+                    handleLogout();
+                    setIsOpen(false);
                   }}
                   className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white px-4 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg
+                    className="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
                     <path
                       strokeLinecap="round"
                       strokeLinejoin="round"
@@ -309,10 +383,18 @@ const MobileMenu = ({ user, handleLogout }) => {
             </>
           ) : (
             <div className="space-y-1 px-2">
-              <MobileNavLink to="/login" icon="login" onClick={() => setIsOpen(false)}>
+              <MobileNavLink
+                to="/login"
+                icon="login"
+                onClick={() => setIsOpen(false)}
+              >
                 Login
               </MobileNavLink>
-              <MobileNavLink to="/register" icon="register" onClick={() => setIsOpen(false)}>
+              <MobileNavLink
+                to="/register"
+                icon="register"
+                onClick={() => setIsOpen(false)}
+              >
                 Register
               </MobileNavLink>
             </div>
@@ -320,8 +402,8 @@ const MobileMenu = ({ user, handleLogout }) => {
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
 // Mobile Navigation Link Component
 const MobileNavLink = ({ to, children, icon, onClick }) => {
@@ -399,9 +481,9 @@ const MobileNavLink = ({ to, children, icon, onClick }) => {
           d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
         />
       ),
-    }
-    return icons[iconName] || icons.dashboard
-  }
+    };
+    return icons[iconName] || icons.dashboard;
+  };
 
   return (
     <Link
@@ -419,7 +501,7 @@ const MobileNavLink = ({ to, children, icon, onClick }) => {
       </svg>
       <span>{children}</span>
     </Link>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

@@ -8,7 +8,7 @@ const Register = () => {
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [role, setRole] = useState("user")
+  const [role, setRole] = useState("agent")
   const [error, setError] = useState("")
   const navigate = useNavigate()
 
@@ -17,8 +17,9 @@ const Register = () => {
     setError("")
     try {
       const res = await api.post("/auth/register", { username, email, password, role })
-      localStorage.setItem("user", JSON.stringify(res.data.user))
-      navigate("/dashboard")
+      if (res.status === 201)
+        
+       navigate("/login")
     } catch (err) {
       setError(err.response?.data?.error || "Registration failed")
     }
@@ -105,8 +106,7 @@ const Register = () => {
                 onChange={(e) => setRole(e.target.value)}
                 className="w-full border-2 border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all duration-200 bg-white/50 backdrop-blur-sm hover:bg-white/80"
               >
-                <option value="user">User</option>
-                <option value="agent">Agent</option>
+                 <option value="agent">Agent</option>
                 <option value="admin">Admin</option>
               </select>
             </div>

@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ['admin', 'agent', 'host'],
+    enum: ['admin', 'agent', 'User'],
     required: true,
   },
   department: {
@@ -30,6 +30,7 @@ const userSchema = new mongoose.Schema({
     enum: ['HR', 'Sustainability', 'Other'],
     default: 'Other',
   },
+  zefkjzef:{}
 }, {
   timestamps: true,
 });
